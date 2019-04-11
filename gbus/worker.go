@@ -269,6 +269,8 @@ func (worker *worker) processMessage(delivery amqp.Delivery, isRPCreply bool) {
 		tx, txErr = worker.txProvider.New()
 		if txErr != nil {
 			worker.log().WithError(txErr).Error("failed to create transaction")
+			//reject the error and reuqueu so it can be processed once we can create transactions
+			worker.Reject(true, delivery)
 			return
 		}
 	}
